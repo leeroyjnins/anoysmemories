@@ -496,11 +496,13 @@ export default function UploadForm({ onSuccess }) {
                       onChange={handleFileChange}
                       className={styles.hiddenInput}
                     />
-                    <span className={styles.sourceIcon}>📷</span>
+                    <span className={styles.sourceIcon}>
+                      <img src="/camera-96.png" alt="Camera" width="32" height="32" />
+                    </span>
                     <span className={styles.sourceTitle}>Camera</span>
                     <span className={styles.sourceSub}>Take photo/video</span>
                   </label>
-                  
+
                   <label className={styles.sourceBtn}>
                     <input
                       ref={libraryInputRef}
@@ -509,7 +511,9 @@ export default function UploadForm({ onSuccess }) {
                       onChange={handleFileChange}
                       className={styles.hiddenInput}
                     />
-                    <span className={styles.sourceIcon}>🖼️</span>
+                    <span className={styles.sourceIcon}>
+                      <img src="/image-96.png" alt="Library" width="32" height="32" />
+                    </span>
                     <span className={styles.sourceTitle}>Library</span>
                     <span className={styles.sourceSub}>Choose existing</span>
                   </label>
