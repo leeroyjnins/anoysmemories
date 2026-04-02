@@ -1,6 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Stream } from '@cloudflare/stream-react'
 import { supabase } from '../lib/supabase'
 import styles from './Slideshow.module.css'
+
+function shuffleArray(array) {
+  const arr = [...array]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr
+}
 
 export default function Slideshow({ onClose }) {
   const [photos, setPhotos]         = useState([])
@@ -19,7 +29,7 @@ export default function Slideshow({ onClose }) {
     channelRef.current = supabase
       .channel('photos-slideshow-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'photos' },
-        payload => setPhotos(prev => [payload.new, ...prev])
+        payload => setPhotos(prev => [...prev, payload.new])
       )
       .subscribe()
     return () => {
@@ -31,8 +41,8 @@ export default function Slideshow({ onClose }) {
 
   async function fetchPhotos() {
     const { data, error } = await supabase
-      .from('photos').select('*').order('created_at', { ascending: false })
-    if (!error && data) setPhotos(data)
+      .from('photos').select('*')
+    if (!error && data) setPhotos(shuffleArray(data))
     setLoading(false)
   }
 
@@ -134,6 +144,9 @@ export default function Slideshow({ onClose }) {
   let uid = isCf ? p.image_url.split(':')[1] : null
   if (uid?.includes('?')) uid = uid.split('?')[0]
 
+  const hasCaption = Boolean(p.caption || p.uploader_name || p.note)
+  const showBackground = hasCaption || navVisible
+
   return (
     <div className={styles.container} onMouseMove={showNav} onClick={showNav} tabIndex={-1}>
 
@@ -141,16 +154,15 @@ export default function Slideshow({ onClose }) {
       <div key={p.id} className={styles.slide}>
         {isCf ? (
           <div className={isPortrait ? styles.cfWrapPortrait : styles.cfWrapLandscape}>
-            <iframe
-              src={`https://iframe.cloudflarestream.com/${uid}?autoplay=true&muted=false&loop=false`}
-              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-              allowFullScreen
+            <Stream
+              src={uid}
+              controls={true}
+              autoplay={true}
+              loop={false}
+              muted={false}
               className={styles.cfPlayer}
               title={p.caption || 'Video'}
-              onLoad={() => {
-                // After the video ends, advance automatically
-                // We rely on the iframe's autoplay + a generous timeout (3min max)
-              }}
+              onEnded={advanceSlide}
             />
           </div>
         ) : isVid ? (
@@ -172,10 +184,10 @@ export default function Slideshow({ onClose }) {
         {/* ── Bottom UI (Caption + Nav seamlessly together) ────────────────── */}
       </div>
 
-      <div className={`${styles.bottomUI} ${navVisible ? styles.bottomUIVisible : ''}`}>
-        <div className={styles.bottomUIBackground} />
+      <div className={styles.bottomUI}>
+        <div className={`${styles.bottomUIBackground} ${showBackground ? styles.bgVisible : styles.bgHidden}`} />
         
-        {(p.caption || p.uploader_name || p.note) && (
+        {hasCaption && (
           <div className={styles.captionArea}>
             {p.caption      && <div className={styles.caption}>{p.caption}</div>}
             {p.note         && <div className={styles.note}>{p.note}</div>}
@@ -183,7 +195,7 @@ export default function Slideshow({ onClose }) {
           </div>
         )}
 
-        <div className={styles.navArea}>
+        <div className={`${styles.navArea} ${navVisible ? styles.navVisible : styles.navHidden}`}>
           <button className={styles.navBtn} onClick={prevSlide} aria-label="Previous">‹</button>
           <span className={styles.counter}>{currentIndex + 1} / {photos.length}</span>
           <button className={styles.navBtn} onClick={nextSlide} aria-label="Next">›</button>

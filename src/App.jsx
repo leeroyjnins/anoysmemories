@@ -78,7 +78,7 @@ export default function App() {
               className={`${styles.navLink} ${page === 'upload' ? styles.active : ''}`}
               onClick={() => navigate('/upload')}
             >
-              Add photo
+              Add Media
             </button>
             <button
               className={`${styles.navLink} ${page === 'qr' ? styles.active : ''}`}
