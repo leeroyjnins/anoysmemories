@@ -116,6 +116,7 @@ export default function UploadForm({ onSuccess }) {
   const [speed, setSpeed] = useState(0)  // bytes/s
   const [eta, setEta] = useState(0)  // seconds
   const fileInputRef = useRef(null)
+  const libraryInputRef = useRef(null)
   const speedSamples = useRef([])
   const lastProgressRef = useRef({ bytes: 0, time: Date.now() })
 
@@ -163,6 +164,7 @@ export default function UploadForm({ onSuccess }) {
     setIsVideo(false)
     setCellularWarning(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
+    if (libraryInputRef.current) libraryInputRef.current.value = ''
   }
 
   // ─── Speed tracking ────────────────────────────────────────────────────────
@@ -379,6 +381,7 @@ export default function UploadForm({ onSuccess }) {
     setError(null)
     setCellularWarning(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
+    if (libraryInputRef.current) libraryInputRef.current.value = ''
   }
 
   // ─── Done screen ──────────────────────────────────────────────────────────
@@ -482,23 +485,39 @@ export default function UploadForm({ onSuccess }) {
                 <button type="button" className={styles.removeBtn} onClick={removeFile}>Remove</button>
               </div>
             ) : (
-              <label className={styles.dropzone}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/mp4,video/quicktime,video/webm"
-                  capture="environment"
-                  onChange={handleFileChange}
-                  className={styles.hiddenInput}
-                />
-                <div className={styles.dropzoneContent}>
-                  <span className={styles.dropzoneIcon}>⊕</span>
-                  <span className={styles.dropzonePrimary}>Tap to take or choose a photo or video</span>
-                  <span className={styles.dropzoneSub}>
-                    JPEG, PNG, HEIC, MP4, MOV · Max {MAX_MB()} MB · {MAX_SECS() < 60 ? `${MAX_SECS()}s` : `${MAX_SECS() / 60}m`} video
-                  </span>
+              <div className={styles.dropzoneContainer}>
+                <div className={styles.sourceSelection}>
+                  <label className={styles.sourceBtn}>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*,video/mp4,video/quicktime,video/webm"
+                      capture="environment"
+                      onChange={handleFileChange}
+                      className={styles.hiddenInput}
+                    />
+                    <span className={styles.sourceIcon}>📷</span>
+                    <span className={styles.sourceTitle}>Camera</span>
+                    <span className={styles.sourceSub}>Take photo/video</span>
+                  </label>
+                  
+                  <label className={styles.sourceBtn}>
+                    <input
+                      ref={libraryInputRef}
+                      type="file"
+                      accept="image/*,video/mp4,video/quicktime,video/webm"
+                      onChange={handleFileChange}
+                      className={styles.hiddenInput}
+                    />
+                    <span className={styles.sourceIcon}>🖼️</span>
+                    <span className={styles.sourceTitle}>Library</span>
+                    <span className={styles.sourceSub}>Choose existing</span>
+                  </label>
                 </div>
-              </label>
+                <div className={styles.dropzoneFooter}>
+                  JPEG, PNG, HEIC, MP4, MOV · Max {MAX_MB()} MB · {MAX_SECS() < 60 ? `${MAX_SECS()}s` : `${MAX_SECS() / 60}m`} max
+                </div>
+              </div>
             )}
           </div>
         )}
