@@ -1,0 +1,19 @@
+Mobile strategy
+
+Max duration: 60 seconds
+Target file size: < 80 MB
+Pre-upload encode: Optional (CPU heavy)
+Target output: 720p / 3 Mbps
+Resumable upload: tus — required
+Connection check: Warn on < 5 Mbps
+WiFi nudge: Show if on cellular
+
+Desktop strategy
+
+Max duration: 3 minutes
+Target file size: < 500 MB raw
+Pre-upload encode: ffmpeg.wasm — yes
+Target output: 1080p / 8 Mbps
+Resumable upload: tus — required
+Connection check: Show live speed est.
+WiFi nudge: Not needed

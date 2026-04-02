@@ -1,0 +1,486 @@
+.wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.formHeader {
+  margin-bottom: 32px;
+}
+
+.formTitle {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.formSub {
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Photo picker */
+
+.dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+.dropzone:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.dropzoneContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.dropzoneIcon {
+  font-size: 28px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.dropzonePrimary {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.dropzoneSub {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.previewWrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.preview {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(26,23,20,0.7);
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.removeBtn:hover {
+  background: rgba(26,23,20,0.9);
+}
+
+/* Text fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.input {
+  background: var(--white);
+  border: 0.5px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(26,23,20,0.06);
+}
+
+.input::placeholder {
+  color: var(--ink-faint);
+}
+
+.textarea {
+  background: var(--white);
+  border: 0.5px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.15s;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(26,23,20,0.06);
+}
+
+.textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.charCount {
+  font-size: 11px;
+  color: var(--ink-faint);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* Error */
+.errorBanner {
+  background: #fff0f0;
+  border: 0.5px solid #f5c2c2;
+  color: #a32d2d;
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Progress */
+.progressWrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Submit */
+.submitBtn {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 14px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success state */
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 12px;
+  text-align: center;
+  padding: 48px 24px;
+  animation: fadeUp 0.4s ease;
+}
+
+.successIcon {
+  font-size: 36px;
+  color: var(--accent);
+}
+
+.successTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.successText {
+  color: var(--ink-muted);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.successActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryBtn {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 11px 22px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.primaryBtn:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.ghostBtn {
+  background: none;
+  color: var(--ink-muted);
+  border: 0.5px solid var(--border-hover);
+  padding: 11px 22px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ghostBtn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 24px 16px 48px; }
+  .formTitle { font-size: 24px; }
+  .dropzone { padding: 32px 16px; }
+  .input, .textarea { font-size: 16px; } /* Prevents zooming on iOS */
+  .submitBtn { padding: 15px 24px; width: 100%; }
+}
+
+/* ── Cellular nudge banner ──────────────────────────────────────────────── */
+.cellularBanner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fffbeb;
+  border: 0.5px solid #f5d87a;
+  color: #78600a;
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  animation: fadeUp 0.25s ease;
+}
+
+.cellularDismiss {
+  flex-shrink: 0;
+  background: none;
+  border: 0.5px solid #f5d87a;
+  color: #78600a;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cellularDismiss:hover {
+  background: #f5d87a44;
+}
+
+/* ── Upload progress panel ──────────────────────────────────────────────── */
+.uploadPanel {
+  background: var(--white);
+  border: 0.5px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+  animation: fadeUp 0.3s ease;
+}
+
+.uploadThumbWrap {
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.uploadThumb {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.8);
+}
+
+.uploadInfo {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.uploadNotice {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ── Encode + upload progress ───────────────────────────────────────────── */
+.phaseWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeUp 0.2s ease;
+}
+
+.phaseLabel {
+  font-size: 13px;
+  color: var(--ink-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.phaseLabel strong {
+  color: var(--ink);
+}
+
+.encodeBar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.encodeBarFill {
+  height: 100%;
+  background: #c4622d;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.uploadBar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.uploadBarFill {
+  height: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+
+.speedRow {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: right;
+  margin-top: -4px;
+}
+
+/* ── Processing card (in gallery) ───────────────────────────────────────── */
+.processingCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  animation: fadeUp 0.35s ease;
+}
+
+.processingThumb {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.85);
+}
+
+.processingBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.processingSpinner {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--border-hover);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.processingStatus {
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-left: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

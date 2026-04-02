@@ -1,0 +1,332 @@
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.sub {
+  font-size: 14px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+/* Page selector */
+.selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.selectorThree {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.pageBtnDonate.pageBtnActive {
+  border-color: #c4622d !important;
+  background: #f5ece5;
+}
+
+.pageBtnDonate .pageBtnLabel {
+  color: #c4622d;
+}
+
+.pageBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  background: var(--white);
+  border: 0.5px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.pageBtn:hover {
+  border-color: var(--ink);
+}
+
+.pageBtnActive {
+  border-color: var(--accent) !important;
+  background: var(--accent-light);
+}
+
+.pageBtnLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pageBtnDesc {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* ── Map & Tribute Section ── */
+
+.mapSection {
+  margin-top: 56px;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-hover);
+  display: flex;
+  flex-direction: column; /* Stacks elements vertically per user request */
+}
+
+.mapContainer {
+  width: 100%;
+  height: 320px;
+  background: #e9ecef; /* Placeholder while map loads */
+}
+
+.mapIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.tributeContent {
+  padding: 40px;
+}
+
+.tributeTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 24px;
+}
+
+.tributeText {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-muted);
+  margin-bottom: 16px;
+}
+
+.tributeText:last-of-type {
+  margin-bottom: 40px;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6dcbd3; /* A soft teal color simulating the ref.png location icon text */
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.infoDetails {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* QR card */
+.qrCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.qrWrap {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.qrLabel {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.qrStar {
+  color: var(--accent);
+}
+
+.qrUrl {
+  font-size: 12px;
+  color: var(--ink-muted);
+  word-break: break-all;
+  text-align: center;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.primaryBtn {
+  flex: 1;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.primaryBtn:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.ghostBtn {
+  flex: 1;
+  background: none;
+  color: var(--ink-muted);
+  border: 0.5px solid var(--border-hover);
+  padding: 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ghostBtn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+/* Tip */
+.tip {
+  background: var(--accent-light);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.tip strong {
+  color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 28px 16px 48px; }
+  .title { font-size: 24px; }
+  .qrCard { padding: 24px 16px; }
+  .donationCard { padding: 24px 16px; }
+}
+
+/* Donation section */
+.donationSection {
+  margin-top: 36px;
+  border-top: 0.5px solid var(--border-hover);
+  padding-top: 28px;
+}
+
+.donationHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.donationHeart {
+  font-size: 26px;
+  color: var(--accent);
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.donationTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.donationSub {
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.donationCard {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.donationLink {
+  font-size: 12px;
+  color: var(--accent);
+  word-break: break-all;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.donationLink:hover {
+  color: var(--ink);
+}
+
+.donationQrImg {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
