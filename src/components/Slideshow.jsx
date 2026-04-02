@@ -169,22 +169,26 @@ export default function Slideshow({ onClose }) {
           />
         )}
 
-        {/* ── Caption overlay ─────────────────────────────────────────────── */}
+        {/* ── Bottom UI (Caption + Nav seamlessly together) ────────────────── */}
+      </div>
+
+      <div className={`${styles.bottomUI} ${navVisible ? styles.bottomUIVisible : ''}`}>
+        <div className={styles.bottomUIBackground} />
+        
         {(p.caption || p.uploader_name || p.note) && (
-          <div className={`${styles.overlay} ${navVisible ? styles.overlayVisible : ''}`}>
+          <div className={styles.captionArea}>
             {p.caption      && <div className={styles.caption}>{p.caption}</div>}
             {p.note         && <div className={styles.note}>{p.note}</div>}
             {p.uploader_name && <div className={styles.uploader}>— {p.uploader_name}</div>}
           </div>
         )}
-      </div>
 
-      {/* ── Navigation bar ────────────────────────────────────────────────── */}
-      <div className={`${styles.nav} ${navVisible ? styles.navVisible : ''}`}>
-        <button className={styles.navBtn} onClick={prevSlide} aria-label="Previous">‹</button>
-        <span className={styles.counter}>{currentIndex + 1} / {photos.length}</span>
-        <button className={styles.navBtn} onClick={nextSlide} aria-label="Next">›</button>
-        <button className={styles.closeBtn} onClick={onClose} aria-label="Exit slideshow">✕</button>
+        <div className={styles.navArea}>
+          <button className={styles.navBtn} onClick={prevSlide} aria-label="Previous">‹</button>
+          <span className={styles.counter}>{currentIndex + 1} / {photos.length}</span>
+          <button className={styles.navBtn} onClick={nextSlide} aria-label="Next">›</button>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Exit slideshow">✕</button>
+        </div>
       </div>
 
     </div>

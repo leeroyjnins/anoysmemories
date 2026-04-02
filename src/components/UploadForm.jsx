@@ -8,9 +8,9 @@ import styles from './UploadForm.module.css'
 
 // ─── Limits ────────────────────────────────────────────────────────────────
 const isMobile = () => window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent)
-const MAX_MB   = () => isMobile() ? 80   : 500
-const MAX_SECS = () => isMobile() ? 60   : 180
-const ENC_RES  = () => isMobile() ? 720  : 1080
+const MAX_MB = () => isMobile() ? 80 : 500
+const MAX_SECS = () => isMobile() ? 60 : 180
+const ENC_RES = () => isMobile() ? 720 : 1080
 const ENC_KBPS = () => isMobile() ? 3000 : 8000
 
 // ─── FFmpeg singleton ───────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ async function getFFmpeg(onProgress) {
       onProgress(Math.round(progress * 100))
     })
     await ffmpegInstance.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`,   'text/javascript'),
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
       wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
     })
   } else {
@@ -49,21 +49,21 @@ function formatEta(seconds) {
   return `${Math.ceil(seconds / 60)}m remaining`
 }
 // ─── Thresholds ────────────────────────────────────────────────────────────
-const SKIP_ENCODE_MB  = 150   // Skip encode below this if codec is H.264
+const SKIP_ENCODE_MB = 200   // Skip encode below this if codec is H.264
 const FORCE_ENCODE_MB = 250   // Always encode above this
 
 // ─── Codec detection via ftyp box (first 256 bytes) ───────────────────────
 async function detectVideoCodec(file) {
   try {
-    const buf   = await file.slice(0, 256).arrayBuffer()
-    const b     = new Uint8Array(buf)
+    const buf = await file.slice(0, 256).arrayBuffer()
+    const b = new Uint8Array(buf)
     // ftyp major brand is at bytes 8-11
     const brand = String.fromCharCode(b[8], b[9], b[10], b[11]).trim()
-    const ext   = file.name.split('.').pop().toLowerCase()
-    if (['hvc1','hev1','heic','mif1'].includes(brand))             return 'hevc'
-    if (brand === 'av01')                                          return 'av1'
-    if (ext === 'mov' && brand === 'qt  ')                        return 'prores'
-    if (['avc1','isom','iso2','mp41','mp42','f4v '].includes(brand)) return 'h264'
+    const ext = file.name.split('.').pop().toLowerCase()
+    if (['hvc1', 'hev1', 'heic', 'mif1'].includes(brand)) return 'hevc'
+    if (brand === 'av01') return 'av1'
+    if (ext === 'mov' && brand === 'qt  ') return 'prores'
+    if (['avc1', 'isom', 'iso2', 'mp41', 'mp42', 'f4v '].includes(brand)) return 'h264'
     return 'unknown'
   } catch {
     return 'unknown'
@@ -73,7 +73,7 @@ async function detectVideoCodec(file) {
 // ─── Smart encode decision ─────────────────────────────────────────────────
 async function shouldEncode(file) {
   const sizeMB = file.size / (1024 * 1024)
-  const ext    = file.name.split('.').pop().toLowerCase()
+  const ext = file.name.split('.').pop().toLowerCase()
   // WebM — skip, Cloudflare handles VP8/VP9 natively
   if (ext === 'webm') return false
   // Rule 1: large file → always encode
@@ -83,7 +83,7 @@ async function shouldEncode(file) {
     const codec = await detectVideoCodec(file)
     return codec === 'hevc' || codec === 'prores' || codec === 'av1'
   }
-  // Mid-range (150–250 MB): encode unless confirmed H.264
+  // Mid-range (2000–250 MB): encode unless confirmed H.264
   const codec = await detectVideoCodec(file)
   return codec !== 'h264'
 }
@@ -102,19 +102,19 @@ function getVideoDuration(file) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function UploadForm({ onSuccess }) {
-  const [file, setFile]               = useState(null)
-  const [preview, setPreview]         = useState(null)
-  const [isVideo, setIsVideo]         = useState(false)
-  const [name, setName]               = useState('')
-  const [caption, setCaption]         = useState('')
-  const [note, setNote]               = useState('')
-  const [error, setError]             = useState(null)
+  const [file, setFile] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [isVideo, setIsVideo] = useState(false)
+  const [name, setName] = useState('')
+  const [caption, setCaption] = useState('')
+  const [note, setNote] = useState('')
+  const [error, setError] = useState(null)
   const [cellularWarning, setCellularWarning] = useState(null) // { sizeMb }
-  const [phase, setPhase]             = useState('idle') // idle | encoding | uploading | saving | done
+  const [phase, setPhase] = useState('idle') // idle | encoding | uploading | saving | done
   const [encodeProgress, setEncodeProgress] = useState(0) // 0-100
   const [uploadProgress, setUploadProgress] = useState(0) // 0-100
-  const [speed, setSpeed]             = useState(0)  // bytes/s
-  const [eta, setEta]                 = useState(0)  // seconds
+  const [speed, setSpeed] = useState(0)  // bytes/s
+  const [eta, setEta] = useState(0)  // seconds
   const fileInputRef = useRef(null)
   const speedSamples = useRef([])
   const lastProgressRef = useRef({ bytes: 0, time: Date.now() })
@@ -168,10 +168,10 @@ export default function UploadForm({ onSuccess }) {
   // ─── Speed tracking ────────────────────────────────────────────────────────
   function trackSpeed(bytesUploaded, bytesTotal) {
     const now = Date.now()
-    const ref  = lastProgressRef.current
-    const dt   = (now - ref.time) / 1000
+    const ref = lastProgressRef.current
+    const dt = (now - ref.time) / 1000
     if (dt < 0.5) return
-    const bps  = (bytesUploaded - ref.bytes) / dt
+    const bps = (bytesUploaded - ref.bytes) / dt
     lastProgressRef.current = { bytes: bytesUploaded, time: now }
 
     // Rolling 3-sample average
@@ -196,9 +196,9 @@ export default function UploadForm({ onSuccess }) {
 
     const uploadId = `upload-${Date.now()}`
     const localPreview = preview
-    const metaName    = name.trim() || null
+    const metaName = name.trim() || null
     const metaCaption = caption.trim() || null
-    const metaNote    = note.trim() || null
+    const metaNote = note.trim() || null
 
     addUpload(uploadId, {
       preview: localPreview,
@@ -241,9 +241,9 @@ export default function UploadForm({ onSuccess }) {
               setEncodeProgress(p)
               updateUpload(uploadId, { encodeProgress: p })
             })
-            const inputName  = `in.${ext}`
+            const inputName = `in.${ext}`
             const outputName = `out.mp4`
-            const res  = ENC_RES()
+            const res = ENC_RES()
             const kbps = ENC_KBPS()
             await ffmpeg.writeFile(inputName, await fetchFile(file))
             await ffmpeg.exec([
@@ -293,7 +293,7 @@ export default function UploadForm({ onSuccess }) {
             metadata: { filename: uploadFile.name, filetype: uploadFile.type },
             onProgress: (bytesUploaded, bytesTotal) => {
               const now = Date.now()
-              const dt  = (now - lastTime) / 1000
+              const dt = (now - lastTime) / 1000
               if (dt >= 0.5) {
                 const bps = (bytesUploaded - lastBytes) / dt
                 lastBytes = bytesUploaded; lastTime = now

@@ -110,21 +110,39 @@
   border: none;
 }
 
-/* ── Caption / meta overlay ──────────────────────────────────────────────── */
-.overlay {
+/* ── Bottom UI (Caption + Nav) ───────────────────────────────────────────── */
+.bottomUI {
   position: absolute;
-  bottom: 72px; /* above nav bar */
-  left: 0;
-  right: 0;
-  padding: 80px 60px 32px;
-  background: linear-gradient(to top, rgba(0,0,0,0.82), transparent);
-  color: white;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 10;
 }
-.overlayVisible { opacity: 1; }
+.bottomUIVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
+.bottomUIBackground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; top: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+  margin-top: -80px; 
+}
+
+/* ── Caption Area ────────────────────────────────────────────────────────── */
+.captionArea {
+  padding: 0 60px 16px;
+  color: white;
+  pointer-events: none;
+}
 .caption {
   font-family: var(--font-display);
   font-size: 38px;
@@ -146,28 +164,15 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
-/* ── Navigation bar ──────────────────────────────────────────────────────── */
-.nav {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+/* ── Navigation Area ─────────────────────────────────────────────────────── */
+.navArea {
+  position: relative;
   height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
   padding: 0 24px;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.navVisible {
-  opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
 }
 
@@ -230,11 +235,11 @@
 
 /* ── Mobile ──────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .overlay  { padding: 60px 24px 32px; bottom: 60px; }
+  .captionArea { padding: 0 24px 12px; }
   .caption  { font-size: 26px; }
   .uploader { font-size: 15px; }
   .note     { font-size: 14px; }
-  .nav      { height: 56px; }
+  .navArea  { height: 56px; }
   .navBtn   { width: 38px; height: 38px; font-size: 22px; }
   .closeBtn { right: 16px; width: 36px; height: 36px; }
 }
