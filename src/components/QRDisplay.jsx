@@ -3,7 +3,6 @@ import { QRCodeSVG } from 'qrcode.react'
 import styles from './QRDisplay.module.css'
 
 const PAGES = [
-  { label: 'Upload', path: '/upload', desc: 'Open the camera & upload' },
   { label: 'Gallery', path: '/', desc: 'Browse all shared photos' },
   { label: '♥ Donate', path: '/qr.png', desc: 'Help and Contribute' },
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Stream } from '@cloudflare/stream-react'
 import { supabase } from '../lib/supabase'
 import { subscribeUploads } from '../lib/uploadManager'
@@ -14,6 +14,150 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   const [editNote, setEditNote]         = useState(photo.note || '')
   const [editUploader, setEditUploader] = useState(photo.uploader_name || '')
   const [isSaving, setIsSaving]         = useState(false)
+
+  // Zoom state
+  const [zoom, setZoom]     = useState(1)
+  const [pan, setPan]       = useState({ x: 0, y: 0 })
+  const isDragging          = useRef(false)
+  const dragStart           = useRef({ x: 0, y: 0 })
+  const panStart            = useRef({ x: 0, y: 0 })
+  const imgRef              = useRef(null)
+
+  const MIN_ZOOM = 1
+  const MAX_ZOOM = 5
+
+  function clampPan(newPan, currentZoom, el) {
+    if (!el || currentZoom <= 1) return { x: 0, y: 0 }
+    const rect = el.getBoundingClientRect()
+    const maxX = (rect.width  * (currentZoom - 1)) / 2
+    const maxY = (rect.height * (currentZoom - 1)) / 2
+    return {
+      x: Math.max(-maxX, Math.min(maxX, newPan.x)),
+      y: Math.max(-maxY, Math.min(maxY, newPan.y)),
+    }
+  }
+
+  function applyZoom(delta, originX, originY) {
+    setZoom(prev => {
+      const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev + delta))
+      if (next === prev) return prev
+      if (next <= 1) { setPan({ x: 0, y: 0 }); return 1 }
+      return next
+    })
+  }
+
+  function onWheel(e) {
+    e.preventDefault()
+    const delta = e.deltaY < 0 ? 0.3 : -0.3
+    applyZoom(delta)
+  }
+
+  function onImgClick(e) {
+    e.stopPropagation()
+    if (isDragging.current) return
+    setZoom(prev => {
+      if (prev > 1) { setPan({ x: 0, y: 0 }); return 1 }
+      return 2
+    })
+  }
+
+  function onMouseDown(e) {
+    if (zoom <= 1) return
+    e.preventDefault()
+    isDragging.current = false
+    dragStart.current  = { x: e.clientX, y: e.clientY }
+    panStart.current   = { ...pan }
+    const onMove = (ev) => {
+      const dx = ev.clientX - dragStart.current.x
+      const dy = ev.clientY - dragStart.current.y
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging.current = true
+      setPan(clampPan({ x: panStart.current.x + dx, y: panStart.current.y + dy }, zoom, imgRef.current))
+    }
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
+  function resetZoom() {
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
+    isDragging.current = false
+  }
+
+  // ── Touch support ──────────────────────────────────────────────
+  const lastTapTime   = useRef(0)
+  const touchStart    = useRef({ x: 0, y: 0 })
+  const touchPanStart = useRef({ x: 0, y: 0 })
+  const pinchStart    = useRef(null) // { dist, zoom, pan }
+
+  function getTouchDist(touches) {
+    const dx = touches[0].clientX - touches[1].clientX
+    const dy = touches[0].clientY - touches[1].clientY
+    return Math.sqrt(dx * dx + dy * dy)
+  }
+
+  function onTouchStart(e) {
+    if (e.touches.length === 1) {
+      const t = e.touches[0]
+      touchStart.current    = { x: t.clientX, y: t.clientY }
+      touchPanStart.current = { ...pan }
+      isDragging.current    = false
+
+      // Double-tap to toggle zoom
+      const now = Date.now()
+      if (now - lastTapTime.current < 300) {
+        e.preventDefault()
+        setZoom(prev => {
+          if (prev > 1) { setPan({ x: 0, y: 0 }); return 1 }
+          return 2
+        })
+        lastTapTime.current = 0
+      } else {
+        lastTapTime.current = now
+      }
+    } else if (e.touches.length === 2) {
+      e.preventDefault()
+      pinchStart.current = {
+        dist: getTouchDist(e.touches),
+        zoom,
+        pan: { ...pan },
+      }
+    }
+  }
+
+  function onTouchMove(e) {
+    if (e.touches.length === 2 && pinchStart.current) {
+      e.preventDefault()
+      const newDist  = getTouchDist(e.touches)
+      const scale    = newDist / pinchStart.current.dist
+      const newZoom  = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, pinchStart.current.zoom * scale))
+      setZoom(newZoom)
+      if (newZoom <= 1) setPan({ x: 0, y: 0 })
+    } else if (e.touches.length === 1) {
+      const t  = e.touches[0]
+      const dx = t.clientX - touchStart.current.x
+      const dy = t.clientY - touchStart.current.y
+      if (zoom <= 1) return   // let browser handle natural scroll
+      e.preventDefault()
+      isDragging.current = true
+      setPan(clampPan(
+        { x: touchPanStart.current.x + dx, y: touchPanStart.current.y + dy },
+        zoom,
+        imgRef.current
+      ))
+    }
+  }
+
+  function onTouchEnd(e) {
+    if (e.touches.length < 2) pinchStart.current = null
+    if (!isDragging.current) {
+      // handled by touchstart double-tap or single-tap click fallback
+    }
+    isDragging.current = false
+  }
 
   const isVideo = photo.image_url.match(/\.(mp4|mov|webm)(\?.*)?$/i)
   const isCloudflareStream = photo.image_url.startsWith('cloudflare-stream:')
@@ -33,6 +177,7 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
       img.onerror = () => setIsPortrait(false)
       img.src = `https://videodelivery.net/${streamUid}/thumbnails/thumbnail.jpg?width=480`
     }
+    resetZoom()
     setExpanded(true)
   }
 
@@ -89,9 +234,12 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
       </div>
 
       {expanded && (
-        <div className={styles.lightbox} onClick={() => setExpanded(false)}>
-        <div className={`${styles.lightboxInner} ${(isCloudflareStream || isVideo) ? (isPortrait ? styles.lightboxPortrait : styles.lightboxVideo) : ''}`} onClick={e => e.stopPropagation()}>
-          <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); }}>✕</button>
+        <div className={styles.lightbox} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); }}>
+        <div
+          className={`${styles.lightboxInner} ${(isCloudflareStream || isVideo) ? (isPortrait ? styles.lightboxPortrait : styles.lightboxVideo) : styles.lightboxImage}`}
+          onClick={e => e.stopPropagation()}
+        >
+          <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); }}>✕</button>
           {isCloudflareStream ? (
             <div className={isPortrait ? styles.streamWrapPortrait : styles.streamWrap}>
                 <iframe
@@ -105,7 +253,35 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
           ) : isVideo ? (
             <video src={photo.image_url} controls autoPlay loop className={styles.lightboxImg} />
           ) : (
-            <img src={photo.image_url} alt={photo.caption || 'Memory'} className={styles.lightboxImg} />
+            <div
+              className={styles.zoomWrap}
+              onWheel={onWheel}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+              style={{ cursor: zoom > 1 ? (isDragging.current ? 'grabbing' : 'grab') : 'zoom-in' }}
+            >
+              <img
+                ref={imgRef}
+                src={photo.image_url}
+                alt={photo.caption || 'Memory'}
+                className={styles.lightboxImg}
+                onClick={onImgClick}
+                onMouseDown={onMouseDown}
+                draggable={false}
+                style={{
+                  transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                  transition: isDragging.current ? 'none' : 'transform 0.2s ease',
+                  userSelect: 'none',
+                }}
+              />
+              <div className={styles.zoomControls}>
+                <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(0.5) }} title="Zoom in">＋</button>
+                <span className={styles.zoomLevel}>{Math.round(zoom * 100)}%</span>
+                <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(-0.5) }} title="Zoom out">－</button>
+                {zoom > 1 && <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); resetZoom() }} title="Reset">⊘</button>}
+              </div>
+            </div>
           )}
           <div className={styles.lightboxMeta}>
               {isEditing ? (

@@ -187,6 +187,11 @@
   animation: fadeUp 0.25s ease;
 }
 
+/* Larger lightbox for images */
+.lightboxImage {
+  max-width: min(1100px, 92vw);
+}
+
 .closeBtn {
   position: absolute;
   top: 12px;
@@ -209,6 +214,69 @@
   width: 100%;
   height: auto;
   display: block;
+  transform-origin: center center;
+}
+
+/* Zoom container — clips panned image */
+.zoomWrap {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  max-height: 82vh;
+  background: #111;
+}
+
+/* Floating zoom controls */
+.zoomControls {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 18, 15, 0.72);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 5px 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.zoomWrap:hover .zoomControls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.zoomBtn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  padding: 0;
+}
+
+.zoomBtn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.zoomLevel {
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 38px;
+  text-align: center;
+  user-select: none;
 }
 
 /* Wider lightbox for landscape videos */
