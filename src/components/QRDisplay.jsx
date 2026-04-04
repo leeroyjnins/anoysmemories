@@ -3,7 +3,9 @@ import { QRCodeSVG } from 'qrcode.react'
 import styles from './QRDisplay.module.css'
 
 const PAGES = [
-  { label: 'Gallery', path: '/', desc: 'Browse all shared photos' },
+  { label: 'Gallery', path: '/', desc: 'Browse all shared media' },
+  { label: 'Upload', path: '/upload', desc: 'Share your memories' },
+
   { label: '♥ Donate', path: '/qr.png', desc: 'Help and Contribute' },
 
 
@@ -12,7 +14,7 @@ const PAGES = [
 const DONATION_URL = import.meta.env.VITE_DONATION_URL || ''
 
 export default function QRDisplay() {
-  const [selectedPath, setSelectedPath] = useState('/upload')
+  const [selectedPath, setSelectedPath] = useState('/')
   const [copied, setCopied] = useState(false)
   const [donationCopied, setDonationCopied] = useState(false)
 
