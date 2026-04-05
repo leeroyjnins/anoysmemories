@@ -26,6 +26,10 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   const MIN_ZOOM = 1
   const MAX_ZOOM = 5
 
+  // Lock/unlock body scroll (prevents gallery behind from scrolling on mobile while panning)
+  function lockScroll()   { document.body.style.overflow = 'hidden' }
+  function unlockScroll() { document.body.style.overflow = '' }
+
   function clampPan(newPan, currentZoom, el) {
     if (!el || currentZoom <= 1) return { x: 0, y: 0 }
     const rect = el.getBoundingClientRect()
@@ -131,17 +135,19 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   function onTouchMove(e) {
     if (e.touches.length === 2 && pinchStart.current) {
       e.preventDefault()
+      lockScroll()
       const newDist  = getTouchDist(e.touches)
       const scale    = newDist / pinchStart.current.dist
       const newZoom  = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, pinchStart.current.zoom * scale))
       setZoom(newZoom)
-      if (newZoom <= 1) setPan({ x: 0, y: 0 })
+      if (newZoom <= 1) { setPan({ x: 0, y: 0 }); unlockScroll() }
     } else if (e.touches.length === 1) {
       const t  = e.touches[0]
       const dx = t.clientX - touchStart.current.x
       const dy = t.clientY - touchStart.current.y
       if (zoom <= 1) return   // let browser handle natural scroll
       e.preventDefault()
+      lockScroll()
       isDragging.current = true
       setPan(clampPan(
         { x: touchPanStart.current.x + dx, y: touchPanStart.current.y + dy },
@@ -153,10 +159,8 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
 
   function onTouchEnd(e) {
     if (e.touches.length < 2) pinchStart.current = null
-    if (!isDragging.current) {
-      // handled by touchstart double-tap or single-tap click fallback
-    }
     isDragging.current = false
+    unlockScroll()
   }
 
   const isVideo = photo.image_url.match(/\.(mp4|mov|webm)(\?.*)?$/i)
@@ -234,12 +238,12 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
       </div>
 
       {expanded && (
-        <div className={styles.lightbox} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); }}>
+        <div className={styles.lightbox} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); unlockScroll(); }}>
         <div
           className={`${styles.lightboxInner} ${(isCloudflareStream || isVideo) ? (isPortrait ? styles.lightboxPortrait : styles.lightboxVideo) : styles.lightboxImage}`}
           onClick={e => e.stopPropagation()}
         >
-          <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); }}>✕</button>
+          <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); unlockScroll(); }}>✕</button>
           {isCloudflareStream ? (
             <div className={isPortrait ? styles.streamWrapPortrait : styles.streamWrap}>
                 <iframe
@@ -277,7 +281,7 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
               />
               <div className={styles.zoomControls}>
                 <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(0.5) }} title="Zoom in">＋</button>
-                <span className={styles.zoomLevel}>{Math.round(zoom * 100)}%</span>
+                <span className={styles.zoomHint}>{zoom > 1 ? 'Drag to pan' : 'Pinch or scroll to zoom'}</span>
                 <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(-0.5) }} title="Zoom out">－</button>
                 {zoom > 1 && <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); resetZoom() }} title="Reset">⊘</button>}
               </div>

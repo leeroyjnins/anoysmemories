@@ -165,7 +165,7 @@ export default function QRDisplay() {
               </div>
               <div className={styles.infoDetails}>
                 San Jose<br />
-                Oton -San Jose - Sta Barbara St, San Miguel<br />
+                Oton -San Jose - Sta Barbara Rd, San Miguel<br />
                 Iloilo City, 5000 Iloilo<br />
                 Philippines
               </div>
@@ -184,7 +184,7 @@ export default function QRDisplay() {
         </div>
         <div className={styles.mapContainer}>
           <iframe
-            src="https://maps.google.com/maps?q=10.759658,122.490464&z=15&output=embed"
+            src="https://maps.google.com/maps?q=10.75996,122.4899&z=15&output=embed"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
