@@ -189,7 +189,7 @@
 
 /* Larger lightbox for images */
 .lightboxImage {
-  max-width: min(1100px, 92vw);
+  max-width: min(760px, 92vw);
 }
 
 .closeBtn {
@@ -213,6 +213,8 @@
 .lightboxImg {
   width: 100%;
   height: auto;
+  max-height: 75vh;
+  object-fit: contain;
   display: block;
   transform-origin: center center;
 }
@@ -222,7 +224,7 @@
   position: relative;
   overflow: hidden;
   line-height: 0;
-  max-height: 82vh;
+  max-height: 75vh;
   background: #111;
 }
 
