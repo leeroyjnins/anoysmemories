@@ -184,7 +184,7 @@ export default function QRDisplay() {
         </div>
         <div className={styles.mapContainer}>
           <iframe
-            src="https://maps.google.com/maps?q=10.75996,122.4899&z=15&output=embed"
+            src="https://maps.google.com/maps?q=10.7600187,122.4900273&z=15&output=embed"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
