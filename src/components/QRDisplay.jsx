@@ -6,7 +6,7 @@ const PAGES = [
   { label: 'Gallery', path: '/', desc: 'Browse all shared media' },
   { label: 'Upload', path: '/upload', desc: 'Share your memories' },
 
-  { label: '♥ Donate', path: '/qr.png', desc: 'Help and Contribute' },
+  { label: '♥ Donate', path: 'donate', desc: 'Help and Contribute' },
 
 
 ]

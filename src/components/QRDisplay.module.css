@@ -324,9 +324,12 @@
 }
 
 .donationQrImg {
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   object-fit: contain;
   border-radius: 8px;
+  padding: 16px;
+  background: white;
+  box-shadow: 0 0 0 1px var(--border);
 }
 
