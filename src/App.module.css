@@ -161,11 +161,26 @@
 
 @media (max-width: 480px) {
   .header {
-    padding: 0 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: auto;
+    padding: 8px 12px;
+    gap: 4px;
+  }
+
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .navLink {
-    padding: 6px 8px;
+    padding: 5px 8px;
     font-size: 12px;
   }
 }
