@@ -108,7 +108,7 @@ export default function QRDisplay() {
               />
             </div>
             <div className={styles.qrLabel}>
-              <span className={styles.qrStar}>✦</span> Anoy's Memory Wall
+              Anoy's Memory Wall
             </div>
             <p className={styles.qrUrl}>{fullUrl}</p>
           </>
