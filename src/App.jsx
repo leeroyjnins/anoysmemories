@@ -64,7 +64,7 @@ export default function App() {
       <div className={styles.app}>
         <header className={styles.header}>
           <button className={styles.logo} onClick={() => navigate('/')}>
-            <span className={styles.logoHeart}>✦</span>
+            <img src="/icon.jpg" alt="logo" className={styles.logoHeart} />
             Anoy's Memories
           </button>
           <nav className={styles.nav}>
