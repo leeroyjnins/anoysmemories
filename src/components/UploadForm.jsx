@@ -332,7 +332,7 @@ export default function UploadForm({ onSuccess }) {
         updateUpload(uploadId, { status: 'uploading', progress: 0 })
         const { error: storageErr } = await supabase.storage
           .from('memory-wall')
-          .upload(safeName, file, { cacheControl: '3600', upsert: false })
+          .upload(safeName, file, { cacheControl: '31536000', upsert: false })
         if (storageErr) throw new Error(storageErr.message)
 
         const { data: urlData } = supabase.storage.from('memory-wall').getPublicUrl(safeName)

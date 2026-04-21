@@ -5,6 +5,15 @@ import { subscribeUploads } from '../lib/uploadManager'
 import styles from './Gallery.module.css'
 import uploadStyles from './UploadForm.module.css'
 
+// Returns a Supabase image-transform URL for thumbnails (Supabase Storage only).
+// Falls back to the original URL for non-storage or Cloudflare URLs.
+function thumbUrl(url, width = 400) {
+  if (!url || !url.includes('/storage/v1/object/public/')) return url
+  return url
+    .replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+    + `?width=${width}&quality=75`
+}
+
 function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   const [loaded, setLoaded]         = useState(false)
   const [expanded, setExpanded]     = useState(false)
@@ -218,7 +227,7 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
             />
           ) : (
             <img
-              src={photo.image_url}
+              src={thumbUrl(photo.image_url, 400)}
               alt={photo.caption || 'Memory'}
               onLoad={() => setLoaded(true)}
               className={`${styles.img} ${loaded ? styles.imgLoaded : ''}`}
@@ -422,7 +431,7 @@ export default function Gallery({ onUpload, isAdmin }) {
   async function fetchPhotos() {
     const { data, error } = await supabase
       .from('photos')
-      .select('*')
+      .select('id, image_url, caption, uploader_name, note, created_at')
       .order('created_at', { ascending: false })
 
     if (!error && data) setPhotos(data)
