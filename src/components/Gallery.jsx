@@ -2,47 +2,39 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Stream } from '@cloudflare/stream-react'
 import { supabase } from '../lib/supabase'
 import { subscribeUploads } from '../lib/uploadManager'
+import { thumbUrl } from '../lib/utils'
 import styles from './Gallery.module.css'
 import uploadStyles from './UploadForm.module.css'
 
-// Returns a Supabase image-transform URL for thumbnails (Supabase Storage only).
-// Falls back to the original URL for non-storage or Cloudflare URLs.
-function thumbUrl(url, width = 400) {
-  if (!url || !url.includes('/storage/v1/object/public/')) return url
-  return url
-    .replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
-    + `?width=${width}&quality=75`
-}
-
 function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
-  const [loaded, setLoaded]         = useState(false)
-  const [expanded, setExpanded]     = useState(false)
+  const [loaded, setLoaded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [isPortrait, setIsPortrait] = useState(false)
-  const [isEditing, setIsEditing]   = useState(false)
-  const [editCaption, setEditCaption]   = useState(photo.caption || '')
-  const [editNote, setEditNote]         = useState(photo.note || '')
+  const [isEditing, setIsEditing] = useState(false)
+  const [editCaption, setEditCaption] = useState(photo.caption || '')
+  const [editNote, setEditNote] = useState(photo.note || '')
   const [editUploader, setEditUploader] = useState(photo.uploader_name || '')
-  const [isSaving, setIsSaving]         = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Zoom state
-  const [zoom, setZoom]     = useState(1)
-  const [pan, setPan]       = useState({ x: 0, y: 0 })
-  const isDragging          = useRef(false)
-  const dragStart           = useRef({ x: 0, y: 0 })
-  const panStart            = useRef({ x: 0, y: 0 })
-  const imgRef              = useRef(null)
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const isDragging = useRef(false)
+  const dragStart = useRef({ x: 0, y: 0 })
+  const panStart = useRef({ x: 0, y: 0 })
+  const imgRef = useRef(null)
 
   const MIN_ZOOM = 1
   const MAX_ZOOM = 5
 
   // Lock/unlock body scroll (prevents gallery behind from scrolling on mobile while panning)
-  function lockScroll()   { document.body.style.overflow = 'hidden' }
+  function lockScroll() { document.body.style.overflow = 'hidden' }
   function unlockScroll() { document.body.style.overflow = '' }
 
   function clampPan(newPan, currentZoom, el) {
     if (!el || currentZoom <= 1) return { x: 0, y: 0 }
     const rect = el.getBoundingClientRect()
-    const maxX = (rect.width  * (currentZoom - 1)) / 2
+    const maxX = (rect.width * (currentZoom - 1)) / 2
     const maxY = (rect.height * (currentZoom - 1)) / 2
     return {
       x: Math.max(-maxX, Math.min(maxX, newPan.x)),
@@ -78,8 +70,8 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
     if (zoom <= 1) return
     e.preventDefault()
     isDragging.current = false
-    dragStart.current  = { x: e.clientX, y: e.clientY }
-    panStart.current   = { ...pan }
+    dragStart.current = { x: e.clientX, y: e.clientY }
+    panStart.current = { ...pan }
     const onMove = (ev) => {
       const dx = ev.clientX - dragStart.current.x
       const dy = ev.clientY - dragStart.current.y
@@ -101,10 +93,10 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   }
 
   // ── Touch support ──────────────────────────────────────────────
-  const lastTapTime   = useRef(0)
-  const touchStart    = useRef({ x: 0, y: 0 })
+  const lastTapTime = useRef(0)
+  const touchStart = useRef({ x: 0, y: 0 })
   const touchPanStart = useRef({ x: 0, y: 0 })
-  const pinchStart    = useRef(null) // { dist, zoom, pan }
+  const pinchStart = useRef(null) // { dist, zoom, pan }
 
   function getTouchDist(touches) {
     const dx = touches[0].clientX - touches[1].clientX
@@ -115,9 +107,9 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
   function onTouchStart(e) {
     if (e.touches.length === 1) {
       const t = e.touches[0]
-      touchStart.current    = { x: t.clientX, y: t.clientY }
+      touchStart.current = { x: t.clientX, y: t.clientY }
       touchPanStart.current = { ...pan }
-      isDragging.current    = false
+      isDragging.current = false
 
       // Double-tap to toggle zoom
       const now = Date.now()
@@ -145,13 +137,13 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
     if (e.touches.length === 2 && pinchStart.current) {
       e.preventDefault()
       lockScroll()
-      const newDist  = getTouchDist(e.touches)
-      const scale    = newDist / pinchStart.current.dist
-      const newZoom  = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, pinchStart.current.zoom * scale))
+      const newDist = getTouchDist(e.touches)
+      const scale = newDist / pinchStart.current.dist
+      const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, pinchStart.current.zoom * scale))
       setZoom(newZoom)
       if (newZoom <= 1) { setPan({ x: 0, y: 0 }); unlockScroll() }
     } else if (e.touches.length === 1) {
-      const t  = e.touches[0]
+      const t = e.touches[0]
       const dx = t.clientX - touchStart.current.x
       const dy = t.clientY - touchStart.current.y
       if (zoom <= 1) return   // let browser handle natural scroll
@@ -204,11 +196,13 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
         <div className={styles.imgWrap}>
           {!loaded && !isCloudflareStream && <div className={styles.imgSkeleton} />}
           {isCloudflareStream ? (
-            <div className={`${styles.img} ${styles.imgLoaded}`} style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', position: 'relative' }}>
+            /* Video card — fixed 16:9 thumbnail, never uses .img class */
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', background: 'var(--accent-light)' }}>
               <img
                 src={`https://videodelivery.net/${streamUid}/thumbnails/thumbnail.jpg?width=480`}
                 alt={photo.caption || 'Video'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                loading="lazy"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 onError={(e) => { e.target.style.display = 'none' }}
               />
               <div className={styles.playOverlay}>
@@ -216,6 +210,7 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
               </div>
             </div>
           ) : isVideo ? (
+            /* Supabase-hosted video — natural dimensions */
             <video
               src={photo.image_url}
               autoPlay
@@ -226,9 +221,11 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
               className={`${styles.img} ${loaded ? styles.imgLoaded : ''}`}
             />
           ) : (
+            /* Photo — full image, natural aspect ratio, optimized format */
             <img
-              src={thumbUrl(photo.image_url, 400)}
+              src={thumbUrl(photo.image_url)}
               alt={photo.caption || 'Memory'}
+              loading="lazy"
               onLoad={() => setLoaded(true)}
               className={`${styles.img} ${loaded ? styles.imgLoaded : ''}`}
             />
@@ -248,13 +245,13 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
 
       {expanded && (
         <div className={styles.lightbox} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); unlockScroll(); }}>
-        <div
-          className={`${styles.lightboxInner} ${(isCloudflareStream || isVideo) ? (isPortrait ? styles.lightboxPortrait : styles.lightboxVideo) : styles.lightboxImage}`}
-          onClick={e => e.stopPropagation()}
-        >
-          <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); unlockScroll(); }}>✕</button>
-          {isCloudflareStream ? (
-            <div className={isPortrait ? styles.streamWrapPortrait : styles.streamWrap}>
+          <div
+            className={`${styles.lightboxInner} ${(isCloudflareStream || isVideo) ? (isPortrait ? styles.lightboxPortrait : styles.lightboxVideo) : styles.lightboxImage}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <button className={styles.closeBtn} onClick={() => { setExpanded(false); setIsEditing(false); resetZoom(); unlockScroll(); }}>✕</button>
+            {isCloudflareStream ? (
+              <div className={isPortrait ? styles.streamWrapPortrait : styles.streamWrap}>
                 <iframe
                   src={`https://iframe.cloudflarestream.com/${streamUid}?autoplay=true&controls=true`}
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
@@ -263,40 +260,40 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
                   title={photo.caption || 'Video'}
                 />
               </div>
-          ) : isVideo ? (
-            <video src={photo.image_url} controls autoPlay loop className={styles.lightboxImg} />
-          ) : (
-            <div
-              className={styles.zoomWrap}
-              onWheel={onWheel}
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-              style={{ cursor: zoom > 1 ? (isDragging.current ? 'grabbing' : 'grab') : 'zoom-in' }}
-            >
-              <img
-                ref={imgRef}
-                src={photo.image_url}
-                alt={photo.caption || 'Memory'}
-                className={styles.lightboxImg}
-                onClick={onImgClick}
-                onMouseDown={onMouseDown}
-                draggable={false}
-                style={{
-                  transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                  transition: isDragging.current ? 'none' : 'transform 0.2s ease',
-                  userSelect: 'none',
-                }}
-              />
-              <div className={styles.zoomControls}>
-                <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(0.5) }} title="Zoom in">＋</button>
-                <span className={styles.zoomHint}>{zoom > 1 ? 'Drag to pan' : 'Pinch or scroll to zoom'}</span>
-                <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(-0.5) }} title="Zoom out">－</button>
-                {zoom > 1 && <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); resetZoom() }} title="Reset">⊘</button>}
+            ) : isVideo ? (
+              <video src={photo.image_url} controls autoPlay loop className={styles.lightboxImg} />
+            ) : (
+              <div
+                className={styles.zoomWrap}
+                onWheel={onWheel}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                style={{ cursor: zoom > 1 ? (isDragging.current ? 'grabbing' : 'grab') : 'zoom-in' }}
+              >
+                <img
+                  ref={imgRef}
+                  src={photo.image_url}
+                  alt={photo.caption || 'Memory'}
+                  className={styles.lightboxImg}
+                  onClick={onImgClick}
+                  onMouseDown={onMouseDown}
+                  draggable={false}
+                  style={{
+                    transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                    transition: isDragging.current ? 'none' : 'transform 0.2s ease',
+                    userSelect: 'none',
+                  }}
+                />
+                <div className={styles.zoomControls}>
+                  <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(0.5) }} title="Zoom in">＋</button>
+                  <span className={styles.zoomHint}>{zoom > 1 ? 'Drag to pan' : 'Pinch or scroll to zoom'}</span>
+                  <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); applyZoom(-0.5) }} title="Zoom out">－</button>
+                  {zoom > 1 && <button className={styles.zoomBtn} onClick={e => { e.stopPropagation(); resetZoom() }} title="Reset">⊘</button>}
+                </div>
               </div>
-            </div>
-          )}
-          <div className={styles.lightboxMeta}>
+            )}
+            <div className={styles.lightboxMeta}>
               {isEditing ? (
                 <>
                   <input className={styles.editInput} value={editUploader} onChange={e => setEditUploader(e.target.value)} placeholder="Uploader Name" />
@@ -361,7 +358,7 @@ function PhotoCard({ photo, index, isAdmin, onEdit, onDelete }) {
                           } catch (cleanupErr) {
                             console.warn("Failed to clean up storage file, but proceeding with DB delete:", cleanupErr)
                           }
-                          
+
                           // 2. Delete the database row
                           try {
                             setExpanded(false) // Close UI immediately

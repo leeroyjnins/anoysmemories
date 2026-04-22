@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Stream } from '@cloudflare/stream-react'
 import { supabase } from '../lib/supabase'
+import { thumbUrl } from '../lib/utils'
 import styles from './Slideshow.module.css'
 
 function shuffleArray(array) {
@@ -41,7 +42,8 @@ export default function Slideshow({ onClose }) {
 
   async function fetchPhotos() {
     const { data, error } = await supabase
-      .from('photos').select('*')
+      .from('photos')
+      .select('id, image_url, caption, uploader_name, note, created_at')
     if (!error && data) setPhotos(shuffleArray(data))
     setLoading(false)
   }
@@ -175,8 +177,9 @@ export default function Slideshow({ onClose }) {
           />
         ) : (
           <img
-            src={p.image_url}
+            src={thumbUrl(p.image_url, 1200)}
             alt={p.caption || 'Memory'}
+            loading="lazy"
             className={styles.media}
           />
         )}

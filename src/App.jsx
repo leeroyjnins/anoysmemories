@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Gallery from './components/Gallery'
-import UploadForm from './components/UploadForm'
-import QRDisplay from './components/QRDisplay'
-import Slideshow from './components/Slideshow'
 import LandingPage from './components/LandingPage'
+import { supabase } from './lib/supabase'
 import styles from './App.module.css'
+
+// Code-split heavy components — UploadForm bundles FFmpeg, Slideshow is large
+const UploadForm = lazy(() => import('./components/UploadForm'))
+const QRDisplay  = lazy(() => import('./components/QRDisplay'))
+const Slideshow  = lazy(() => import('./components/Slideshow'))
 
 const ROUTES = {
   '/': 'gallery',
@@ -43,19 +46,28 @@ export default function App() {
     }
   }
 
-  function handleAdminSubmit(e) {
+  async function handleAdminSubmit(e) {
     e.preventDefault()
-    if (adminPassword === (import.meta.env.VITE_ADMIN_PASSWORD || 'secret')) {
-      setIsAdmin(true)
-      setShowAdminPrompt(false)
-      setAdminPassword('')
-    } else {
-      setAdminPassword('')
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-verify', {
+        body: { password: adminPassword },
+      })
+      if (!error && data?.ok) {
+        setIsAdmin(true)
+        setShowAdminPrompt(false)
+      }
+    } catch {
+      // Edge Function unreachable — silent fail
     }
+    setAdminPassword('')
   }
 
   if (page === 'slideshow') {
-    return <Slideshow onClose={() => navigate('/')} />
+    return (
+      <Suspense fallback={<div style={{ color: '#fff', padding: '2rem' }}>Loading…</div>}>
+        <Slideshow onClose={() => navigate('/')} />
+      </Suspense>
+    )
   }
 
   return (
@@ -96,9 +108,18 @@ export default function App() {
         </header>
 
         <main className={styles.main}>
-          {page === 'gallery' && <Gallery onUpload={() => navigate('/upload')} isAdmin={isAdmin} />}
-          {page === 'upload' && <UploadForm onSuccess={() => navigate('/')} />}
-          {page === 'qr' && <QRDisplay />}
+          {/*
+            Gallery is always-mounted so its fetched data and realtime
+            subscription survive tab switches. Only CSS visibility toggles.
+          */}
+          <div style={{ display: page === 'gallery' ? '' : 'none' }}>
+            <Gallery onUpload={() => navigate('/upload')} isAdmin={isAdmin} />
+          </div>
+
+          <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading…</div>}>
+            {page === 'upload' && <UploadForm onSuccess={() => navigate('/')} />}
+            {page === 'qr'     && <QRDisplay />}
+          </Suspense>
         </main>
 
         <footer className={styles.footer}>

@@ -56,7 +56,11 @@
 }
 
 .card {
+  display: inline-block; /* CRITICAL for masonry columns: prevents cards from splitting/cropping vertically */
+  width: 100%;
   break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
   margin-bottom: 16px;
   background: var(--white);
   border-radius: var(--radius-lg);
@@ -76,29 +80,33 @@
 }
 
 .imgWrap {
-  position: relative;
   width: 100%;
-  min-height: 120px;
+  position: relative;
   background: var(--accent-light);
 }
 
 .imgSkeleton {
-  position: absolute;
-  inset: 0;
+  width: 100%;
+  padding-bottom: 120%; /* elegant vertical placeholder until true image loads */
   background: linear-gradient(90deg, var(--accent-light) 0%, #eeddd5 50%, var(--accent-light) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s ease infinite;
 }
 
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .img {
   width: 100%;
   height: auto;
-  display: block;
+  display: block; /* Removes baseline gap below image */
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -114,25 +122,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   transition: background 0.2s ease;
 }
 
 .card:hover .playOverlay {
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .playIcon {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   color: var(--ink);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.15s ease;
   padding-left: 3px;
 }
@@ -197,7 +205,7 @@
   top: 12px;
   right: 12px;
   z-index: 9999;
-  background: rgba(26,23,20,0.6);
+  background: rgba(26, 23, 20, 0.6);
   color: white;
   border: none;
   width: 30px;
@@ -269,11 +277,11 @@
 }
 
 .zoomBtn:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .zoomHint {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 11px;
   font-weight: 400;
   font-style: italic;
@@ -370,7 +378,11 @@
   animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .empty {
   display: flex;
@@ -444,7 +456,8 @@
   color: white;
 }
 
-.editInput, .editTextarea {
+.editInput,
+.editTextarea {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -461,23 +474,45 @@
   resize: vertical;
 }
 
-.editInput:focus, .editTextarea:focus {
+.editInput:focus,
+.editTextarea:focus {
   outline: none;
   border-color: var(--accent);
 }
 
 @media (max-width: 1024px) {
-  .masonry { columns: 3 220px; }
+  .masonry {
+    columns: 3 220px;
+  }
 }
 
 @media (max-width: 768px) {
-  .masonry { columns: 2 160px; column-gap: 12px; }
-  .pageHeader { flex-wrap: wrap; }
+  .masonry {
+    columns: 2 160px;
+    column-gap: 12px;
+  }
+
+  .pageHeader {
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 480px) {
-  .wrap { padding: 0 12px 32px; }
-  .masonry { columns: 2 140px; column-gap: 10px; }
-  .card { margin-bottom: 10px; transform: none !important; }
-  .card:hover { transform: translateY(-2px) !important; }
+  .wrap {
+    padding: 0 12px 32px;
+  }
+
+  .masonry {
+    columns: 2 140px;
+    column-gap: 10px;
+  }
+
+  .card {
+    margin-bottom: 10px;
+    transform: none !important;
+  }
+
+  .card:hover {
+    transform: translateY(-2px) !important;
+  }
 }
